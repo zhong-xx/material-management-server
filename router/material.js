@@ -82,7 +82,7 @@ router.post('/updateMaterialMessage', (req, res)=> {
 
 router.post('/deleteMaterial', (req, res)=> {
     let data = [];
-    for(let item in req.body.messageList) {
+    for(let item of req.body.messageList) {
         let response = Material.findOneAndDelete({_id: item._id});
         data.push(response);
     }
@@ -96,7 +96,31 @@ router.post('/deleteMaterial', (req, res)=> {
 })
 
 router.get('/selectMatrials', (req, res)=> {
-    
+    Material.find({
+        item_type: req.query.itemType,
+        model: req.query.model,
+        is_effective: req.query.isEffective
+    })
+    .skip((req.query.page-1)*req.query.size)
+    .limit(parseInt(req.query.size))
+    .select('name model reserve_type is_effective sort')
+    .then(data=> {
+        Material.count({
+            item_type: req.query.itemType,
+            model: req.query.model,
+            is_effective: req.query.isEffective
+        })
+        .then(count=> {
+            return res.json({
+                code: '0000',
+                msg: '获取物资信息成功',
+                data: {
+                    count,
+                    data
+                }
+            })
+        })
+    })
 })
 
 module.exports = router;
