@@ -80,4 +80,23 @@ router.post('/updateMaterialMessage', (req, res)=> {
     })
 })
 
+router.post('/deleteMaterial', (req, res)=> {
+    let data = [];
+    for(let item in req.body.messageList) {
+        let response = Material.findOneAndDelete({_id: item._id});
+        data.push(response);
+    }
+    Promise.all(data)
+            .then(values => {
+                res.json({
+                    code: '0000',
+                    msg: '删除物资成功'
+                })
+            })
+})
+
+router.get('/selectMatrials', (req, res)=> {
+    
+})
+
 module.exports = router;

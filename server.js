@@ -17,7 +17,3 @@ app.use('/materialApi/material', materialRouter);
 
 app.listen(3002, () => {console.log('服务器开启成功')});
 
-let date = new Date();
-let time = date.getFullYear().toString()+"-"+ (date.getMonth() + 1).toString()+"-"+ date.getDate().toString();
-console.log(time)
-
