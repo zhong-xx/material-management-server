@@ -33,7 +33,27 @@ router.get('/getMaterialsMessage', (req, res)=> {
             .limit(parseInt(req.query.size))
             .select('name model reserve_type is_effective sort')
             .then(data=> {
-                Material.count({ item_type: req.query.itemType})
+                if(data.length === 0 && req.query.page > 1) {
+                    Material.find({ item_type: req.query.itemType})
+                    .skip((req.query.page-2)*req.query.size)
+                    .limit(parseInt(req.query.size))
+                    .select('name model reserve_type is_effective sort')
+                    .then(data=> {
+                        Material.count({ item_type: req.query.itemType})
+                        .then(count=> {
+                            return res.json({
+                                code: '0000',
+                                msg: '获取物资信息成功',
+                                data: {
+                                    count,
+                                    data,
+                                    reduce: true
+                                }
+                            })
+                        })
+                    })
+                }else {
+                    Material.count({ item_type: req.query.itemType})
                         .then(count=> {
                             return res.json({
                                 code: '0000',
@@ -44,6 +64,8 @@ router.get('/getMaterialsMessage', (req, res)=> {
                                 }
                             })
                         })
+                }
+                
             })
 })
 
@@ -105,21 +127,51 @@ router.get('/selectMatrials', (req, res)=> {
     .limit(parseInt(req.query.size))
     .select('name model reserve_type is_effective sort')
     .then(data=> {
-        Material.count({
-            item_type: req.query.itemType,
-            model: req.query.model,
-            is_effective: req.query.isEffective
-        })
-        .then(count=> {
-            return res.json({
-                code: '0000',
-                msg: '获取物资信息成功',
-                data: {
-                    count,
-                    data
-                }
+        if(data.length === 0 && req.query.page > 1) {
+            Material.find({
+                item_type: req.query.itemType,
+                model: req.query.model,
+                is_effective: req.query.isEffective
             })
-        })
+            .skip((req.query.page-2)*req.query.size)
+            .limit(parseInt(req.query.size))
+            .select('name model reserve_type is_effective sort')
+            .then(data=> {
+                Material.count({
+                    item_type: req.query.itemType,
+                    model: req.query.model,
+                    is_effective: req.query.isEffective
+                })
+                .then(count=> {
+                    return res.json({
+                        code: '0000',
+                        msg: '获取物资信息成功',
+                        data: {
+                            count,
+                            data,
+                            reduce: true
+                        }
+                    })
+                })
+            })
+        } else {
+            Material.count({
+                item_type: req.query.itemType,
+                model: req.query.model,
+                is_effective: req.query.isEffective
+            })
+            .then(count=> {
+                return res.json({
+                    code: '0000',
+                    msg: '获取物资信息成功',
+                    data: {
+                        count,
+                        data
+                    }
+                })
+            })
+        }
+        
     })
 })
 
